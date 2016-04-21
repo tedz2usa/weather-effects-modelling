@@ -5,8 +5,8 @@ public class MyEmitter : MonoBehaviour {
 
     public GameObject sphere;
     private int counter = 10;
-    private int numObjects = 50;
-    private int bounds = 20;
+    private int numObjects = 20;
+    private int bounds = 30;
 
     // Use this for initialization
     void Start () {

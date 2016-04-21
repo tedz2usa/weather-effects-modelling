@@ -12,28 +12,58 @@ public class MyParticle : MonoBehaviour {
     private int id;
     private int counter;
 
+    private float lifetime = 0;
+    static bool printed = false;
+
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
         id = nextID;
         nextID++;
         counter = 10;
+        transform.localScale = Vector3.one * Random.Range(1.5f, 2.5f);
+        
+        if (!printed)
+        {
+
+            Debug.Log("print");
+
+            float i = 0;
+            while( i < 200)
+            {
+                float bias = linearBias(i, 0, 200);
+                Debug.Log("bias(" + i + ") = " + bias);
+                i += 0.5f;
+            }
+
+            printed = true;
+
+        }
+
     }
 	
 	// Update is called once per frame
 	void FixedUpdate () {
 
+        lifetime += Time.fixedDeltaTime;
+        if (lifetime > 20)
+        {
+            Destroy(this.gameObject);
+        }
+
         Vector3 towardsCenter = Vector3.Normalize(vortextCenter - transform.position);
 
-        Vector3 towardsCenterForce = towardsCenter * 8;
+        Vector3 towardsCenterForce = towardsCenter * 10;
 
         Vector3 tangential = Vector3.Normalize(Vector3.Cross(towardsCenter, Vector3.up));
 
-        Vector3 tangentialForce = tangential * 2f;
+        Vector3 tangentialForce = tangential * 4f;
 
-        Vector3 upwardsForce = Vector3.up * Random.Range(11, 40);//Mathf.Abs(10 - transform.position.y);
+        float MylinearBias = linearBias(transform.position.y, 0, 200);
+        Vector3 upwardsForce = Vector3.up * Random.Range(18, 25);// * (MylinearBias + 1f);
 
-        
+
+
         Vector3 force = towardsCenterForce + tangentialForce + upwardsForce;
 
         if (id == 2)
@@ -41,10 +71,11 @@ public class MyParticle : MonoBehaviour {
             counter--;
             if (counter < 0)
             {
-                Debug.Log("towardsCenterForce: " + towardsCenterForce);
-                Debug.Log("tangentialForce: " + tangentialForce);
-                Debug.Log("upwardsForce: " + upwardsForce);
-                Debug.Log("Sum: " + force);
+                //Debug.Log("towardsCenterForce: " + towardsCenterForce);
+                //Debug.Log("tangentialForce: " + tangentialForce);
+                //Debug.Log("upwardsForce: " + upwardsForce);
+                //Debug.Log("linearBias: " + MylinearBias);
+                //Debug.Log("Sum: " + force);
                 counter = 10;
             }
             
@@ -54,4 +85,14 @@ public class MyParticle : MonoBehaviour {
         rb.AddForce(force);
 
     }
+
+    public static float linearBias(float value, float begin, float end)
+    {
+        float length = (end - begin);
+        float middle = length / 2;
+        float distanceToMiddle = Mathf.Abs(value - middle);
+        return 1 - distanceToMiddle / middle * 0.95f;
+    }
+
+
 }
